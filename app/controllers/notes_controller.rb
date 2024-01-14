@@ -1,5 +1,6 @@
 class NotesController < ApplicationController
     before_action :set_note, only: %i[show edit update destroy]
+    before_action :authenticate_user!
     def index
         @notes = Note.all
     end
@@ -8,11 +9,11 @@ class NotesController < ApplicationController
     end
 
     def new
-        @note = Note.new
+        @note = current_user.notes.build
     end
 
     def create
-        @note = Note.new(note_params)
+        @note = current_user.notes.build(note_params)
         respond_to do |format|
             if @note.save
                 format.html { redirect_to note_url(@note), notice: "Note was created successfully" }
@@ -51,6 +52,6 @@ class NotesController < ApplicationController
     end
 
     def note_params
-        params.require(:note).permit(:title, :content)
+        params.require(:note).permit(:title, :content, :user_id)
     end
 end
